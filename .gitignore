@@ -1,11 +1,9 @@
 # Ignore virtual environment directory
 venv/
 
-# Ignore all files under the data directory
-data/
+# Ignore all files under the data directory, but allow .gitkeep
+data/*
+!data/.gitkeep
 
 # Ignore shitty jetbrains thing
 .idea/
-
-# Include an empty .gitkeep file in the data directory to track it in Git
-!data/.gitkeep
