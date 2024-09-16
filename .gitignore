@@ -1,0 +1,8 @@
+# Ignore virtual environment directory
+venv/
+
+# Ignore all files under the data directory
+data/
+
+# Include an empty .gitkeep file in the data directory to track it in Git
+!data/.gitkeep
