@@ -10,7 +10,7 @@ from island_clustering import (
     format_clusters,
     export_clusters_to_markdown
 )
-from data_manager import load_json, fetch_or_load_data
+from data_manager import load_json_from_file, fetch_or_load_data, validate_browser_type, validate_alliance_name
 
 
 def create_interactive_heatmap(coordinates_list: list, alliance_name: str):
@@ -18,24 +18,23 @@ def create_interactive_heatmap(coordinates_list: list, alliance_name: str):
         print("No coordinate data found.")
         return
 
-    min_x = min(coord[0] for coord in coordinates_list)
-    max_x = max(coord[0] for coord in coordinates_list)
-    min_y = min(coord[1] for coord in coordinates_list)
-    max_y = max(coord[1] for coord in coordinates_list)
+    # Set fixed grid bounds (1:1 to 100:100)
+    min_x, max_x = 1, 100
+    min_y, max_y = 1, 100
 
-    map_width = max_x - min_x + 1
-    map_height = max_y - min_y + 1
+    # Create a 100x100 heatmap grid
+    grid_size = 100
+    island_heatmap = np.zeros((grid_size, grid_size))
 
-    map_size = max(map_width, map_height)
-    island_heatmap = np.zeros((map_size, map_size))
-
+    # Populate the heatmap with coordinates, adjusting for the fixed grid size
     for x, y in coordinates_list:
-        island_heatmap[y - min_y, x - min_x] += 1
+        if min_x <= x <= max_x and min_y <= y <= max_y:
+            island_heatmap[y - min_y, x - min_x] += 1
 
-    # Create a DataFrame for Plotly with the correct coordinates
+    # Create a DataFrame for Plotly with the fixed coordinates
     df = pd.DataFrame(island_heatmap,
-                      index=[f'{y + min_y}' for y in range(map_size)],
-                      columns=[f'{x + min_x}' for x in range(map_size)])
+                      index=[f'{y + min_y}' for y in range(grid_size)],
+                      columns=[f'{x + min_x}' for x in range(grid_size)])
 
     # Melt the DataFrame to long format for Plotly
     df_melted = df.reset_index().melt(id_vars='index', var_name='X', value_name=f'{alliance_name} Cities')
@@ -50,8 +49,8 @@ def create_interactive_heatmap(coordinates_list: list, alliance_name: str):
         title=f"{alliance_name} Alliance City Distribution Heatmap",
         xaxis_title="X Coordinate",
         yaxis_title="Y Coordinate",
-        xaxis=dict(scaleanchor="y"),  # This ensures the x-axis maintains a 1:1 aspect ratio with the y-axis
-        yaxis=dict(constrain='domain'),  # Ensure the y-axis scales with the domain
+        xaxis=dict(scaleanchor="y", range=[1, 100]),  # Force x-axis range from 1 to 100
+        yaxis=dict(constrain='domain', range=[1, 100]),  # Force y-axis range from 1 to 100
         coloraxis_colorbar=dict(title=f'Amount of cities')
     )
 
@@ -64,13 +63,15 @@ def create_interactive_heatmap(coordinates_list: list, alliance_name: str):
 
 
 def main():
-    config_data = load_json()
+    config_data = load_json_from_file('../user_config.json')
+
+    browser_type = config_data.get('browser_type')
+    validate_browser_type(browser_type)
 
     alliance_name = config_data.get('alliance_name')
-    if not alliance_name:
-        raise ValueError("Alliance name not found in config.")
+    validate_alliance_name(alliance_name)
 
-    coordinates_list, was_loaded_from_cache = fetch_or_load_data(alliance_name)
+    coordinates_list, was_loaded_from_cache = fetch_or_load_data(alliance_name, browser_type)
 
     # Apply filtering based on minimum cities before clustering
     min_cities_on_island_for_cluster = int(config_data.get('min_cities_on_island_for_cluster'))

@@ -27,6 +27,7 @@ Note: This script uses the Firefox Driver for Selenium by default.
 You can configure the script's behavior through the `user_config.json` file. The settings include:
 
 - **`alliance_name`**: Name of the alliance you'd like to run this on.
+- **`browser_type`**: The type of the browser that Selenium will use when scraping the data off of Ikalogs. Supported browsers are: chrome, chromium, firefox, brave, edge, opera.
 - **`max_cluster_distance`**: Defines the maximum distance between islands that are considered part of the same cluster.
   A value of 1 means only adjacent islands are clustered together.
 - **`min_cities_on_island_for_cluster`**: Specifies the minimum number of cities an island must have to be included in a
@@ -57,5 +58,38 @@ You can configure the script's behavior through the `user_config.json` file. The
    - Results for the island clustering can be viewed inside the `data/{alliance_name}_island_clusters.md` file.
    - Results for the heatmap can be viewed in the browser (a new tab should have opened up for you with the plotly heatmap)
 
+### Results Examples
+#### City clusters results:
+```
+# City Clusters:
+#### City Cluster A - total of 14
+- 39:48 -> 5 cities
+- 38:48 -> 9 cities
+
+#### City Cluster B - total of 15
+- 56:49 -> 6 cities
+- 57:49 -> 9 cities
+
+#### City Cluster C - total of 14
+- 50:51 -> 5 cities
+- 50:50 -> 9 cities
+
+#### City Cluster D - total of 12
+- 37:60 -> 6 cities
+- 37:59 -> 6 cities
+
+#### City Cluster E - total of 12
+- 53:52 -> 12 cities
+
+#### City Cluster F - total of 19
+- 56:51 -> 13 cities
+- 55:52 -> 6 cities
+
+#### City Cluster G - total of 23
+- 59:50 -> 13 cities
+- 60:51 -> 4 cities
+- 59:52 -> 6 cities
+```
+
+#### Heatmap Results:
 ![Heatmap Example](readme_images/heatmap_example.png)
-![City Clusters Example](readme_images/city_clusters_example.png)

@@ -4,41 +4,95 @@ from typing import Any
 import re
 import time
 from selenium import webdriver
+from selenium.webdriver.edge.service import Service as EdgeService
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
+from selenium.webdriver.chrome.service import Service as BraveService
+from selenium.webdriver.chrome.service import Service as ChromiumService
+from selenium.webdriver.chrome.service import Service as ChromeService
+from webdriver_manager.chrome import ChromeDriverManager
+from webdriver_manager.core.os_manager import ChromeType
+from selenium.webdriver.chrome import service
+from webdriver_manager.opera import OperaDriverManager
 from selenium.webdriver.firefox.service import Service as FirefoxService
 from webdriver_manager.firefox import GeckoDriverManager
+
 from bs4 import BeautifulSoup
 
 # Configuration
 DATA_FOLDER = '../data/'
-CONFIG_FILE = '../user_config.json'
 
 
 # Initialize the Selenium WebDriver
-def init_selenium_driver():
-    service = FirefoxService(GeckoDriverManager().install())
-    driver = webdriver.Firefox(service=service)
+def init_selenium_driver(browser_type: str):
+    """Init the selenium driver according to the browser type the user has selected in the config"""
+    browser_type = browser_type.lower()
+
+    if browser_type == "chrome":
+        driver = webdriver.Chrome(service=ChromeService(ChromeDriverManager().install()))
+
+    elif browser_type == "chromium":
+        driver = webdriver.Chrome(
+            service=ChromiumService(ChromeDriverManager(chrome_type=ChromeType.CHROMIUM).install()))
+
+    elif browser_type == "firefox":
+        driver = webdriver.Firefox(service=FirefoxService(GeckoDriverManager().install()))
+
+    elif browser_type == "brave":
+        driver = webdriver.Chrome(service=BraveService(ChromeDriverManager(chrome_type=ChromeType.BRAVE).install()))
+
+    elif browser_type == "edge":
+        driver = webdriver.Edge(service=EdgeService(EdgeChromiumDriverManager().install()))
+
+    elif browser_type == "opera":
+        webdriver_service = service.Service(OperaDriverManager().install())
+        webdriver_service.start()
+
+        driver = webdriver.Remote(webdriver_service.service_url, webdriver.DesiredCapabilities.OPERA)
+
+    else:
+        raise ValueError(f"Unsupported browser type: {browser_type}")
+
     return driver
 
 
-def load_json() -> dict:
-    if not os.path.exists(CONFIG_FILE):
-        raise FileNotFoundError(f"{CONFIG_FILE} not found.")
+def load_json_from_file(file_location: str) -> Any:
+    if not os.path.exists(file_location):
+        raise FileNotFoundError(f"{file_location} not found.")
 
-    with open(CONFIG_FILE, 'r') as file:
+    with open(file_location, 'r') as file:
         config = json.load(file)
 
     return config
 
 
-def fetch_or_load_data(alliance_name: str) -> tuple[Any, bool]:
+def validate_alliance_name(alliance_name: str):
+    if not alliance_name:
+        raise ValueError("Alliance name not found in config.")
+
+
+def validate_browser_type(browser_type: str) -> bool:
+    """Checks that the browser type provided in the config is valid, raises an exception if not"""
+
+    # Valid browser types
+    supported_browsers = {'chrome', 'opera', 'chromium', 'firefox', 'brave', 'edge'}
+
+    # Validate the browser type
+    if browser_type.lower() not in supported_browsers:
+        raise ValueError(
+            f"Browser type is not supported: '{browser_type}'. Change it to one of the following: {supported_browsers}.")
+
+    return True
+
+
+def fetch_or_load_data(alliance_name: str, browser_type: str, load_from_cache_if_possible: bool = True) -> tuple[Any, bool]:
     """Fetch data from the site or return cached data if available"""
     file_path = os.path.join(DATA_FOLDER, f'{alliance_name}.json')
 
-    if os.path.exists(file_path):
+    if os.path.exists(file_path) and load_from_cache_if_possible:
         with open(file_path, 'r') as file:
             return json.load(file), True
 
-    driver = init_selenium_driver()
+    driver = init_selenium_driver(browser_type)
     all_coordinates = []
     page = 1
     while True:

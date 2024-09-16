@@ -2,12 +2,13 @@ from itertools import product
 from collections import defaultdict
 
 
-def cluster_islands(coordinates_list: list, max_distance=2) -> list:
-    coord_set = set(map(tuple, coordinates_list))
+def cluster_islands(coordinates_list: list, max_distance: int = 2) -> list:
+    coord_set = set(map(tuple, coordinates_list))  # Faster lookups, good
     visited = set()
     clusters = []
 
-    def dfs(coord: tuple, cluster: list):
+    # Helper function for depth-first search
+    def depth_first_search(coord: tuple, cluster: list):
         stack = [coord]
         while stack:
             current = stack.pop()
@@ -15,15 +16,27 @@ def cluster_islands(coordinates_list: list, max_distance=2) -> list:
                 continue
             visited.add(current)
             cluster.append(current)
-            for dx, dy in product(range(-max_distance, max_distance + 1), repeat=2):
-                neighbor = (current[0] + dx, current[1] + dy)
-                if neighbor in coord_set and neighbor not in visited:
-                    stack.append(neighbor)
 
+            # Only check relevant neighbors within the given distance
+            for dx, dy in product(range(-max_distance, max_distance + 1), repeat=2):
+
+                # Avoid (0, 0) because it's the current island
+                if dx == 0 and dy == 0:
+                    continue
+
+                # Calculate the neighbor coordinates
+                neighbor = (current[0] + dx, current[1] + dy)
+
+                # Only include neighbors that are within the specified max distance
+                if abs(dx) <= max_distance and abs(dy) <= max_distance:
+                    if neighbor in coord_set and neighbor not in visited:
+                        stack.append(neighbor)
+
+    # Start clustering islands
     for coord in coord_set:
         if coord not in visited:
             cluster = []
-            dfs(coord, cluster)
+            depth_first_search(coord, cluster)
             clusters.append(cluster)
 
     return clusters
