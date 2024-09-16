@@ -1,6 +1,6 @@
 {
-  "alliance_name": "",
-  "browser_type": "FILL IN YOUR BROWSER TYPE HERE",
+  "alliance_name": "-SF-",
+  "browser_type": "firefox",
   "max_cluster_distance": 1,
   "min_cities_on_island_for_cluster": 4,
   "min_total_cities_for_cluster": 10
