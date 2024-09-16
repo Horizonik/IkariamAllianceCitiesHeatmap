@@ -55,4 +55,7 @@ You can configure the script's behavior through the `user_config.json` file. The
 
 4. **View the Results**:
    - Results for the island clustering can be viewed inside the `data/{alliance_name}_island_clusters.md` file.
-   - Results for the heatmap can be viewed in the browser (a new tab should have opened up for you with the plotly heatmap) 
+   - Results for the heatmap can be viewed in the browser (a new tab should have opened up for you with the plotly heatmap)
+
+![Heatmap Example](readme_images/heatmap_example.png)
+![City Clusters Example](readme_images/city_clusters_example.png)
