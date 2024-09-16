@@ -5,7 +5,7 @@ venv/
 data/
 
 # Ignore shitty jetbrains thing
-.idea
+.idea/
 
 # Include an empty .gitkeep file in the data directory to track it in Git
 !data/.gitkeep
