@@ -1,39 +1,35 @@
 # Heatmap Generator
 
+## Overview
+
+The **Heatmap Generator** is a Python-based tool designed to create interactive heatmaps and cluster islands based on player city data. It retrieves data from the Ikalogs map site and visualizes the distribution of cities, allowing for dynamic heatmap generation and customizable clustering of nearby islands.
+
 ## Features
 
-- **Interactive Heatmap**: View an interactive heatmap in your browser, showcasing the distribution of player cities.
-  The intensity of the heatmap represents the number of cities in a given cell.
-    - **Dynamic Sizing**: The heatmap size adjusts dynamically based on the minimum and maximum coordinates derived from
-      the data.
-    - **Hover Details**: Hover over each cell to see the number of cities and their coordinates.
-- **Island Clustering**: Groups nearby islands into clusters if they are within a configurable distance and contain a
-  minimum number of
-  cities. The final result is a markdown-formatted list of clusters.
-    - **Configurable**: There are various configurable settings for the clusters generation. Take a look at
-      the `user_config.json` file!
+### 1. Interactive Heatmap
+- **Dynamic Sizing**: The heatmap adjusts based on the range of coordinates from the data.
+- **Hover Details**: Hover over any cell to view the number of cities and the exact coordinates.
 
-## Data
+### 2. Island Clustering
+- **Cluster Nearby Islands**: Islands are grouped into clusters if they are within a specified distance and have a minimum number of cities.
+- **Configurable Parameters**: Control the distance between islands and the minimum number of cities for clustering through the `user_config.json` file.
 
-The data is sourced from the Ikalogs map site. Due to the presence of a JavaScript script that loads the data, direct
-HTML fetching is not feasible. Instead, we use Selenium to simulate user interactions and extract the necessary data.
-Note: This script uses the Firefox Driver for Selenium by default.
+## Data Source
 
-- **Data Caching**: After the initial data load, the information is parsed and saved into a JSON file
-  named `{alliance_name}.json`. If you wish to fetch new data, you need delete this file and run the script again.
+The data is extracted from the Ikalogs map website. Due to JavaScript rendering, the data cannot be fetched directly via HTML parsing, so Selenium is used to simulate user interaction and scrape the data. The default configuration uses the Firefox Driver.
 
-### Configuration
+### Data Caching
+After the initial data fetch, the parsed data is stored in `{alliance_name}.json`. To fetch new data, delete the JSON file and re-run the script.
 
-You can configure the script's behavior through the `user_config.json` file. The settings include:
+## Configuration
 
-- **`alliance_name`**: Name of the alliance you'd like to run this on.
-- **`browser_type`**: The type of the browser that Selenium will use when scraping the data off of Ikalogs. Supported browsers are: chrome, chromium, firefox, brave, edge, opera.
-- **`max_cluster_distance`**: Defines the maximum distance between islands that are considered part of the same cluster.
-  A value of 1 means only adjacent islands are clustered together.
-- **`min_cities_on_island_for_cluster`**: Specifies the minimum number of cities an island must have to be included in a
-  cluster.
-- **`min_total_cities_for_cluster`**: Sets a threshold for the total number of cities in a cluster. Clusters with fewer
-  cities than this value will be excluded.
+You can configure the script by editing the `user_config.json` file. Available settings include:
+
+- **`alliance_name`**: The name of the alliance to fetch data for.
+- **`browser_type`**: The browser Selenium will use for scraping. Supported browsers: `chrome`, `chromium`, `firefox`, `brave`, `edge`, `opera`.
+- **`max_cluster_distance`**: Maximum distance (in island coordinates) between islands to be considered part of the same cluster.
+- **`min_cities_on_island_for_cluster`**: Minimum number of cities required on an island for it to be included in a cluster.
+- **`min_total_cities_for_cluster`**: Minimum number of cities in a cluster to include it in the final results.
 
 ## Getting Started
 
@@ -58,7 +54,7 @@ You can configure the script's behavior through the `user_config.json` file. The
    - Results for the island clustering can be viewed inside the `data/{alliance_name}_island_clusters.md` file.
    - Results for the heatmap can be viewed in the browser (a new tab should have opened up for you with the plotly heatmap)
 
-### Results Examples
+## Results Examples
 #### City clusters results:
 ```
 # City Clusters:
